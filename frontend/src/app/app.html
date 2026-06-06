@@ -1,0 +1,129 @@
+<div class="container">
+  <header>
+    <h1>Work Order Tracker</h1>
+    <p>Create, search, update, and track service/work orders.</p>
+  </header>
+
+  <section class="card">
+    <h2>{{ form.id ? 'Edit Work Order' : 'Create Work Order' }}</h2>
+
+    <form (ngSubmit)="saveWorkOrder()">
+      <div class="form-grid">
+        <div>
+          <label>Customer</label>
+          <select [(ngModel)]="form.customer_id" name="customer_id" required>
+            <option value="">Select customer</option>
+            <option *ngFor="let customer of customers" [value]="customer.id">
+              {{ customer.name }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label>Status</label>
+          <select [(ngModel)]="form.status" name="status">
+            <option>New</option>
+            <option>In Progress</option>
+            <option>Done</option>
+          </select>
+        </div>
+
+        <div class="full">
+          <label>Title</label>
+          <input
+            type="text"
+            [(ngModel)]="form.title"
+            name="title"
+            placeholder="Example: Fix leaking sink"
+            required
+          />
+        </div>
+
+        <div class="full">
+          <label>Description</label>
+          <textarea
+            [(ngModel)]="form.description"
+            name="description"
+            placeholder="Describe the work needed"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button type="submit">
+          {{ form.id ? 'Update Work Order' : 'Add Work Order' }}
+        </button>
+
+        <button type="button" class="secondary" (click)="resetForm()">
+          Clear
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Work Orders</h2>
+
+    <div class="filters">
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (input)="loadWorkOrders()"
+        placeholder="Search by customer, title, or description"
+      />
+
+      <select [(ngModel)]="selectedStatus" (change)="loadWorkOrders()">
+        <option value="">All Statuses</option>
+        <option>New</option>
+        <option>In Progress</option>
+        <option>Done</option>
+      </select>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Customer</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let order of workOrders">
+          <td>{{ order.id }}</td>
+          <td>{{ order.customer_name }}</td>
+          <td>{{ order.title }}</td>
+          <td>{{ order.description }}</td>
+          <td>
+            <span
+              class="status"
+              [class.done]="order.status === 'Done'"
+              [class.progress]="order.status === 'In Progress'"
+            >
+              {{ order.status }}
+            </span>
+          </td>
+          <td>{{ order.created_at | date:'short' }}</td>
+          <td>
+            <button class="small" (click)="editWorkOrder(order)">
+              Edit
+            </button>
+
+            <button class="small danger" (click)="deleteWorkOrder(order.id)">
+              Delete
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="workOrders.length === 0">
+          <td colspan="7" class="empty">No work orders found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
